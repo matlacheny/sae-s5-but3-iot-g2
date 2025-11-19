@@ -266,7 +266,7 @@ font-size: 16px;
 
 <header>
     <img src="../image/Logo.webp" alt="Logo Medibox">
-        <h1> Espace Aide-Soignant</h1>
+        <h1> Espace Medecin </h1>
 </header>
 
 <div class="container">
@@ -283,7 +283,7 @@ font-size: 16px;
         </div>
 
         <div class="bloc-info">
-            <h2>Aide-soignant</h2>
+            <h2> Aide-Soignant</h2>
             <p>Nom : </p>
             <p>Prénom : </p>
             <p>Date de naissance : </p>
@@ -294,7 +294,14 @@ font-size: 16px;
     </div>
 
     <h2 class="section-title">Prescription</h2>
-    <iframe class="pdf-viewer" src="<!-- URL du PDF chargé depuis la BD -->"></iframe>
+<button class="BouttonAjoutPrescription" type="button"> Ajouter une prescription </button>    
+<button class="BouttonAjoutPrescription" type="button"> Supprimer </button>    
+</div>
+
+</br> 
+
+
+<iframe class="pdf-viewer" src="<!-- URL du PDF chargé depuis la BD -->"></iframe>
 
     <h2 class="section-title">Suivi du traitement</h2>
  
@@ -410,65 +417,3 @@ function openDetails(day, month, year) {
         renderCalendar(month, year);
     </script>
 </div>
-
-
-
-
-    <!-- Configuration de la boîte -->
-    <h2 class="section-title">Configuration de la boîte</h2>
-<div class="box-config">
-
-
-    <div class="compartiments-row">
-    <div class="compartiment">
-        <div class="compartiment-title">Compartiment 1</div>
-        <input type="text" placeholder="Nom du médicament">
-        <input type="time">
-        <input type="number" min="1" placeholder="Quantité">
-    </div>
-
-    <div class="compartiment">
-        <div class="compartiment-title">Compartiment 2</div>
-        <input type="text" placeholder="Nom du médicament">
-        <input type="time">
-        <input type="number" min="1" placeholder="Quantité">
-    </div>
-
-    <div class="compartiment">
-        <div class="compartiment-title">Compartiment 3</div>
-        <input type="text" placeholder="Nom du médicament">
-        <input type="time">
-        <input type="number" min="1" placeholder="Quantité">
-    </div>
-</div>
-
-<div class="compartiments-row">
-    <div class="compartiment">
-        <div class="compartiment-title">Compartiment 4</div>
-        <input type="text" placeholder="Nom du médicament">
-        <input type="time">
-        <input type="number" min="1" placeholder="Quantité">
-    </div>
-
-    <div class="compartiment">
-        <div class="compartiment-title">Compartiment 5</div>
-        <input type="text" placeholder="Nom du médicament">
-        <input type="time">
-        <input type="number" min="1" placeholder="Quantité">
-    </div>
-
-    <div class="compartiment">
-        <div class="compartiment-title">Compartiment 6</div>
-        <input type="text" placeholder="Nom du médicament">
-        <input type="time">
-        <input type="number" min="1" placeholder="Quantité">
-    </div>
-</div>
-
-<!-- Alertes -->
-<h2 class="alert-title">Alertes</h2> 
-<div class="alert-box">Aucune alerte pour le moment</div>
-
-
-</body>
-</html>

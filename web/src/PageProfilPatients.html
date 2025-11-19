@@ -250,6 +250,7 @@
             openDetails(day, m, y);
         });
 
+// pour quand on clique sur une date du calendrier  enlever la Popup et affciher à droite comme pour le prodil Aide Soignants 
         function openDetails(day, month, year) {
             modal.style.display = "flex";
             document.getElementById('modal-date').innerText = `Détails du ${day}/${month + 1}/${year}`;
@@ -259,13 +260,12 @@
                 <div class='medoc-item'>
                     <b>Doliprane</b> – 08:00<br>
                     Quantité : 1<br>
-                    Compartiment : A2
+                    Compartiment : 2
                 </div>
                 <div class='medoc-item'>
                     <b>Ibuprofène</b> – 14:00<br>
                     Quantité : 1<br>
-                    Compartiment : B1
-                    
+                    Compartiment : 1                   
                 </div>
             `;
             document.getElementById('modal-content').innerHTML = placeholder;
