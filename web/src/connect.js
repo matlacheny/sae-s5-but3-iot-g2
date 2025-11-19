@@ -29,12 +29,14 @@ async function send(){
         const ok = await verif_infos(ID, PWD, LISTE_ROLES[i].toLowerCase());
             if (ok) {
                 connexion = true;
+
                 console.log("Connexion acceptée :", ID, PWD);
                 // redirection
-                window.location.href = "./src/PageProfil"+LISTE_ROLES[i]+".html"; // a changer en fonction des pages de redirections
+                window.location.href = "./src/PageProfil"+LISTE_ROLES[i]+".html"; 
 
                 break;
             }
+            console.log("connexion : "+connexion);
     }
     // message d'erreur si connexion refusée
     if(connexion == false){
@@ -57,6 +59,7 @@ async function verif_infos(id, pwd, table) {
 
         if (!response.ok) {
             console.log(`ID invalide dans table ${table}`);
+            console.log(response);
             return false;
         }
 
