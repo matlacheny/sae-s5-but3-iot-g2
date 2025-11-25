@@ -154,12 +154,30 @@
 
         <div class="bloc-info">
             <h2>Aide-soignant</h2>
-            <p>Nom : </p>
-            <p>Prénom : </p>
-            <p>Date de naissance : </p>
-            <p>Sexe :  </p>
-            <p>Adresse : </p>
-            <p>Email : </p>
+            
+            <div id="info-aide-soignant" style="display: none;">
+                <p>Nom : <span id="as-nom"></span></p>
+                <p>Prénom : <span id="as-prenom"></span></p>
+                <p>Date de naissance : <span id="as-naissance"></span></p>
+                <p>Sexe : <span id="as-sexe"></span></p>
+                <p>Adresse : <span id="as-adresse"></span></p>
+                <p>Email : <span id="as-email"></span></p>
+
+                <button id="btn-changer-as" 
+                        style="margin-top: 15px; width: 100%; padding: 8px; background-color: #f0ad4e; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 14px;">
+                    Changer d'aide-soignant
+                </button>
+            </div>
+
+            <div id="btn-assign-aide-soignant">
+                <p style="color: #666; font-style: italic; margin-bottom: 15px;">
+                    Aucun aide-soignant n'est encore assigné à votre dossier.
+                </p>
+                <button onclick="window.location.href='AssignerAideSoignant.html'" 
+                        style="padding: 10px 20px; background-color: #4a73d9; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 14px;">
+                    Assigner un aide-soignant
+                </button>
+            </div>
         </div>
     </div>
 
@@ -249,8 +267,86 @@
             const y = parseInt(target.getAttribute('data-year'));
             openDetails(day, m, y);
         });
+        
+        // ----- Page assigner un aide soignant ------
 
-// pour quand on clique sur une date du calendrier  enlever la Popup et affciher à droite comme pour le prodil Aide Soignants 
+        // Configuration API
+        const API_KEY = "9769a0eab09284d4bfeef45e4103642cf00b1b17f15f65afeb4f336890e37e63";
+        const API_URL_BASE = "https://apidatabasesae-aee3egcmdke2b6a2.germanywestcentral-01.azurewebsites.net/api";
+
+        // On récupère l'ID du patient dans l'URL (ou '1' par défaut pour les tests)
+        const urlParams = new URLSearchParams(window.location.search);
+        const idPatient = urlParams.get('idPatient') || 'pat1';
+
+        async function chargerDonneesPatient() {
+            try {
+                // ... (début de la fonction identique) ...
+                const response = await fetch(`${API_URL_BASE}/patients/${idPatient}`, {
+                    headers: { "api_key": API_KEY }
+                });
+                
+                if (!response.ok) throw new Error("Erreur récupération patient");
+                const patient = await response.json();
+
+                const divInfo = document.getElementById('info-aide-soignant');
+                const divBtn = document.getElementById('btn-assign-aide-soignant');
+
+                // Mise à jour du bouton "Assigner" (cas vide)
+                const btnAssigner = divBtn.querySelector('button');
+                if(btnAssigner) {
+                    btnAssigner.onclick = () => window.location.href = `AssignerAideSoignant.html?idPatient=${idPatient}`;
+                }
+
+                // 3. Vérifier si un aide-soignant est déjà assigné
+                if (patient.fk_aide_soignant) {
+                    // OUI -> On affiche les infos
+                    divInfo.style.display = 'block';
+                    divBtn.style.display = 'none';
+                    chargerInfoAideSoignant(patient.fk_aide_soignant);
+
+                    // --- AJOUT : Activation du bouton "Changer" ---
+                    const btnChanger = document.getElementById('btn-changer-as');
+                    if (btnChanger) {
+                        btnChanger.onclick = () => window.location.href = `AssignerAideSoignant.html?idPatient=${idPatient}`;
+                    }
+
+                } else {
+                    // NON -> On affiche le bouton assigner standard
+                    divInfo.style.display = 'none';
+                    divBtn.style.display = 'block';
+                }
+            } catch (error) {
+                console.error(error);
+            }
+        }
+
+        async function chargerInfoAideSoignant(idAS) {
+            try {
+                const response = await fetch(`${API_URL_BASE}/aidesoignants/${idAS}`, {
+                    headers: { "api_key": API_KEY }
+                });
+                const asData = await response.json();
+
+                // Remplissage des champs HTML
+                document.getElementById('as-nom').textContent = asData.nomFamille || asData.nom || '';
+                document.getElementById('as-prenom').textContent = asData.prenom || '';
+                document.getElementById('as-email').textContent = asData.adresse_electronique || '';
+                document.getElementById('as-adresse').textContent = asData.adresse_postale || '';
+                
+                // Si vous avez ajouté des champs date/sexe dans le HTML, ajoutez-les ici :
+                if(document.getElementById('as-naissance')) document.getElementById('as-naissance').textContent = asData.date_naissance || '';
+                if(document.getElementById('as-sexe')) document.getElementById('as-sexe').textContent = asData.sexe || '';
+
+            } catch (error) {
+                console.error("Erreur chargement AS", error);
+            }
+        }
+
+        // Lancer la récupération des données
+        chargerDonneesPatient();
+
+
+        // pour quand on clique sur une date du calendrier  enlever la Popup et affciher à droite comme pour le prodil Aide Soignants 
         function openDetails(day, month, year) {
             modal.style.display = "flex";
             document.getElementById('modal-date').innerText = `Détails du ${day}/${month + 1}/${year}`;
