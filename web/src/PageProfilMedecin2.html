@@ -273,23 +273,23 @@ font-size: 16px;
 
     <div class="infos">
         <div class="bloc-info">
-            <h2>Médecin</h2>
-            <p>Nom : </p>
-            <p>Prénom : </p>
-            <p>Date de naissance : </p>
-            <p>Sexe :  </p>
-            <p>Adresse : </p>
-            <p>Email :  </p>
+           <h2>Patient</h2>
+            <p>Nom : <span id="p-nom"></span></p>
+            <p>Prénom : <span id="p-prenom"></span></p>
+            <p>Date de naissance : <span id="p-ddn"></span></p>
+            <p>Sexe : <span id="p-sexe"></span></p>
+            <p>Adresse postale : <span id="p-adresse"></span></p>
+            <p>Adresse électronique : <span id="p-mail"></span></p>
         </div>
 
         <div class="bloc-info">
-            <h2> Aide-Soignant</h2>
-            <p>Nom : </p>
-            <p>Prénom : </p>
-            <p>Date de naissance : </p>
-            <p>Sexe :  </p>
-            <p>Adresse : </p>
-            <p>Email : </p>
+            <h2>Aide-Soignant</h2>
+            <p>Nom : <span id="as-nom"></span></p>
+            <p>Prénom : <span id="as-prenom"></span></p>
+            <p>Date de naissance : <span id="as-ddn"></span></p>
+            <p>Sexe : <span id="as-sexe"></span></p>
+            <p>Adresse postale : <span id="as-adresse"></span></p>
+            <p>Adresse électronique : <span id="as-mail"></span></p>
         </div>
     </div>
 
@@ -297,7 +297,6 @@ font-size: 16px;
 <button class="BouttonAjoutPrescription" type="button"> Ajouter une prescription </button>    
 <button class="BouttonAjoutPrescription" type="button"> Supprimer </button>    
 </div>
-
 </br> 
 
 
@@ -323,6 +322,70 @@ font-size: 16px;
 </div>
  <!-- POUR LE CALENDRIER -->
     <script>
+
+
+// --- Récupération de l'ID patient depuis l'URL ---
+const params = new URLSearchParams(window.location.search);
+const idPatient = params.get("id");
+
+if (!idPatient) {
+    alert("Aucun patient sélectionné !");
+}
+
+const API_KEY = "9769a0eab09284d4bfeef45e4103642cf00b1b17f15f65afeb4f336890e37e63";
+const API_URL_BASE = "https://apidatabasesae-aee3egcmdke2b6a2.germanywestcentral-01.azurewebsites.net/api";
+
+async function chargerInfos() {
+    try {
+        // ---- 1. Charger infos patient ----
+        const repPatient = await fetch(`${API_URL_BASE}/patients/${idPatient}`, {
+            headers: { "api_key": API_KEY }
+        });
+
+        if (!repPatient.ok) throw new Error("Patient introuvable");
+
+        const patient = await repPatient.json();
+
+        // ---- remplir infos patient ----
+        document.getElementById("p-nom").textContent = patient.nomFamille;
+        document.getElementById("p-prenom").textContent = patient.prenom;
+        document.getElementById("p-ddn").textContent = patient.date_naissance;
+        document.getElementById("p-sexe").textContent = patient.sexe;
+        document.getElementById("p-mail").textContent = patient.adresse_electronique;
+        document.getElementById("p-adresse").textContent = patient.adresse_postale;
+
+        // ---- 2. Vérifier si un aide-soignant est assigné ----
+        if (!patient.fk_aide_soignant) {
+            document.getElementById("as-nom").textContent = "Aucun aide-soignant assigné";
+            return;
+        }
+
+        // ---- 3. Charger infos aide-soignant ----
+        const repAS = await fetch(`${API_URL_BASE}/aidesoignants/${patient.fk_aide_soignant}`, {
+            headers: { "api_key": API_KEY }
+        });
+
+        if (!repAS.ok) throw new Error("Aide-soignant introuvable");
+
+        const aide = await repAS.json();
+
+        // ---- remplir infos aide-soignant ----
+       document.getElementById("as-nom").textContent = aide.nomFamille;
+        document.getElementById("as-prenom").textContent = aide.prenom;
+        document.getElementById("as-ddn").textContent = aide.date_naissance;
+        document.getElementById("as-sexe").textContent = aide.sexe;
+        document.getElementById("as-mail").textContent = aide.adresse_electronique;
+        document.getElementById("as-adresse").textContent = aide.adresse_postale;
+
+    } catch (err) {
+        console.error(err);
+        alert("Erreur lors du chargement du patient");
+    }
+}
+
+chargerInfos();
+
+/* pour calendrier */
         const calendarContainer = document.getElementById("os-calendar");
 
         const date = new Date();

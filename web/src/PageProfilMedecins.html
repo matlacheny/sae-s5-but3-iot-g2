@@ -90,6 +90,69 @@
         .patient-item:hover {
             background-color: #f0f8ff;
         }
+
+
+/* pour colorier en bleu quand le medecin s assigne un patient */
+       .selected-patient {
+    background-color: #cfe3ff !important;
+    border-left: 5px solid #4a73d9;
+}
+
+.assign-btn {
+    background-color: #e6f0ff;
+    border: 1px solid #4a73d9;
+    padding: 5px 8px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-right: 10px;
+}
+
+.profile-btn {
+    background-color: white;
+    border: 1px solid #888;
+    padding: 5px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    float: right;
+}
+
+/* POPUP */
+.popup-overlay {
+    position: fixed;
+    top:0; left:0;
+    width:100%; height:100%;
+    background: rgba(0,0,0,0.4);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.popup-box {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    width: 350px;
+    text-align: center;
+}
+
+.btn-non {
+    background-color: rgb(230,60,60);
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.btn-oui {
+    background-color: white;
+    border: 1px solid #4a73d9;
+    padding: 8px 15px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+
     </style>
 </head>
 <body>
@@ -108,22 +171,205 @@
     </div>
 
     <div class="patient-list">
-        <!-- Placeholder patients -->
-        <div class="patient-item">Patient 1</div>
-        <div class="patient-item">Patient 2</div>
-        <div class="patient-item">Patient 3</div>
-        <div class="patient-item">Patient 4</div>
-        <div class="patient-item">Patient 5</div>
-        <div class="patient-item">Patient 6</div>
-        <div class="patient-item">Patient 7</div>
-        <!-- Scroll si plus de 7 -->
-        <div class="patient-item">Patient 8</div>
-        <div class="patient-item">Patient 9</div>
+      
     </div>
+
+    <div id="legend" style="margin-top:15px; display:none;">
+    <span style="width:15px; height:15px; background:#cfe3ff; display:inline-block; border-radius:4px;"></span>
+    <span style="margin-left:8px;">Vos patients</span>
+    </div>
+
 
 
 </div>
 
 <br/>
+
+
+
+
+
+<script>
+    // --- CONFIG API ---
+    const API_KEY = "9769a0eab09284d4bfeef45e4103642cf00b1b17f15f65afeb4f336890e37e63";
+    const API_URL_BASE = "https://apidatabasesae-aee3egcmdke2b6a2.germanywestcentral-01.azurewebsites.net/api";
+
+    // ID du médecin connecté (à remplacer + tard par votre système de connexion)
+    const idMedecin = "med1";
+
+    const patientListDiv = document.querySelector(".patient-list");
+    const searchBar = document.querySelector(".search-bar");
+
+    let patients = [];
+
+    // --- CHARGEMENT DES PATIENTS ---
+    async function chargerPatients() {
+        try {
+            const response = await fetch(
+                `${API_URL_BASE}/patients?fk_medecin_traitant=${idMedecin}`,
+                {
+                    headers: {
+                        "api_key": API_KEY
+                    }
+                }
+            );
+
+            if (!response.ok) throw new Error("Erreur lors du chargement des patients");
+
+            patients = await response.json();
+            afficherPatients(patients);
+
+        } catch (error) {
+            console.error("Erreur :", error);
+        }
+    }
+
+    // --- AFFICHAGE ---
+   function afficherPatients(list) {
+    patientListDiv.innerHTML = "";
+
+    list.forEach(p => {
+        const div = document.createElement("div");
+        div.className = "patient-item";
+        
+        if (p.fk_medecin_traitant === idMedecin) {
+            div.classList.add("selected-patient");
+        }
+
+        // BOUTON S’ASSIGNER
+        const btnAssign = document.createElement("button");
+        btnAssign.className = "assign-btn";
+        btnAssign.textContent = (p.fk_medecin_traitant === idMedecin) ? "Assigné" : "S’assigner";
+
+        btnAssign.onclick = () => toggleAssign(p, div, btnAssign);
+
+        // NOM PATIENT
+        const label = document.createElement("span");
+        label.textContent = `${p.prenom} ${p.nomFamille}`;
+
+        // BOUTON PROFIL
+        const btnProfil = document.createElement("button");
+        btnProfil.className = "profile-btn";
+        btnProfil.textContent = "Afficher profil";
+
+       btnProfil.addEventListener("click", () => {
+window.location.href = `PageProfilMedecin2.html?id=${p.id_patient}`;
+    });
+
+
+        div.appendChild(btnAssign);
+        div.appendChild(label);
+        div.appendChild(btnProfil);
+
+        patientListDiv.appendChild(div);
+    });
+
+    document.getElementById("legend").style.display = "block";
+}
+
+
+    // --- RECHERCHE ---
+    searchBar.addEventListener("input", () => {
+        const search = searchBar.value.toLowerCase();
+
+        const filtered = patients.filter(p =>
+            p.prenom.toLowerCase().includes(search) ||
+            p.nomFamille.toLowerCase().includes(search)
+        );
+
+        afficherPatients(filtered);
+    });
+
+    // Charger la liste initiale
+    chargerPatients();
+
+
+
+function toggleAssign(p, div, btn) {
+    // Si déjà assigné → popup confirmation
+    if (p.fk_medecin_traitant === idMedecin) {
+        afficherPopup(() => {
+            mettreAJourAssignation(p.id_patient, null);
+            p.fk_medecin_traitant = null;
+
+            div.classList.remove("selected-patient");
+            btn.textContent = "S’assigner";
+        });
+    } 
+    else {
+        // S’assigner directement
+        mettreAJourAssignation(p.id_patient, idMedecin);
+        p.fk_medecin_traitant = idMedecin;
+
+        div.classList.add("selected-patient");
+        btn.textContent = "Assigné";
+    }
+}
+
+function afficherPopup(onConfirm) {
+    const overlay = document.createElement("div");
+    overlay.className = "popup-overlay";
+
+    const box = document.createElement("div");
+    box.className = "popup-box";
+
+    box.innerHTML = `
+        <p>Voulez-vous vraiment ne plus être assigné à ce patient ?<br><br>
+        (Vous n’aurez plus accès à ses informations)</p>
+        <br>
+    `;
+
+    const btnNon = document.createElement("button");
+    btnNon.className = "btn-non";
+    btnNon.textContent = "Non";
+    btnNon.onclick = () => overlay.remove();
+
+    const btnOui = document.createElement("button");
+    btnOui.className = "btn-oui";
+    btnOui.textContent = "Oui";
+    btnOui.onclick = () => {
+        onConfirm();
+        overlay.remove();
+    };
+
+    box.appendChild(btnNon);
+    box.appendChild(btnOui);
+    overlay.appendChild(box);
+    document.body.appendChild(overlay);
+}
+
+
+async function mettreAJourAssignation(idPatient, nouveauMedecin) {
+    try {
+        await fetch(`${API_URL_BASE}/patients/${idPatient}`, {
+            method: "PATCH",
+            headers: {
+                "api_key": API_KEY,
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                fk_medecin_traitant: nouveauMedecin
+            })
+        });
+    } 
+    catch (e) {
+        console.error("Erreur API assignation :", e);
+    }
+}
+
+
+    
+</script>
+
+
+
+
+
+
+
+
+
+
+
 </body>
 </html>  
