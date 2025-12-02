@@ -1,0 +1,123 @@
+/* ==== LISTE DES PATIENTS ==== */
+
+.container {
+  padding: 20px;
+  text-align: center;
+}
+
+.container h2 {
+  margin-bottom: 20px;
+  color: #1e3d59;
+}
+
+/* Barre de recherche */
+.search-container {
+  position: relative;
+  display: inline-block;
+  margin-bottom: 30px;
+}
+
+.search-bar {
+  width: 600px;
+  padding: 10px 40px 10px 15px;
+  border-radius: 25px;
+  border: 1px solid #ccc;
+  font-size: 16px;
+}
+
+.search-bar::placeholder {
+  color: #999;
+}
+
+.search-icon {
+  position: absolute;
+  right: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 18px;
+  color: #888;
+}
+
+/* Liste des patients */
+.patient-list {
+  max-height: 400px;
+  width: 60%;
+  margin: 0 auto;
+  overflow-y: auto;
+  border: 1px solid #ccc;
+  border-radius: 12px;
+  padding: 10px;
+  background-color: white;
+}
+
+.patient-item {
+  padding: 15px;
+  border-bottom: 1px solid #eee;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  transition: background 0.2s;
+}
+
+.patient-item:last-child {
+  border-bottom: none;
+}
+
+.patient-item:hover {
+  background-color: #f0f8ff;
+}
+
+/* Patient assigné (médecin) */
+.selected-patient {
+  background-color: #cfe3ff !important;
+  border-left: 5px solid #4a73d9;
+}
+
+/* Nom du patient */
+.patient-name {
+  flex: 1;
+  text-align: left;
+  font-weight: 500;
+  font-size: 16px;
+}
+
+/* Boutons */
+.assign-btn {
+  background-color: #e6f0ff;
+  border: 1px solid #4a73d9;
+  padding: 8px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background 0.2s;
+}
+
+.assign-btn:hover {
+  background-color: #d0e7ff;
+}
+
+.profile-btn {
+  background-color: white;
+  border: 1px solid #888;
+  padding: 8px 15px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s;
+}
+
+.profile-btn:hover {
+  background-color: #f5f5f5;
+  border-color: #4a73d9;
+}
+
+/* Légende */
+#legend {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  color: #666;
+  font-size: 14px;
+}

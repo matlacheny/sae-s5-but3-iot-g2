@@ -1,3 +1,5 @@
+
+<!-- 
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -265,47 +267,52 @@ font-size: 16px;
 <body>
 
 <header>
-    <img src="../image/Logo.webp" alt="Logo Medibox">
+    <img src="../image/logoMedibox.png" alt="Logo Medibox">
         <h1> Espace Aide-Soignant</h1>
 </header>
 
 <div class="container">
 
     <div class="infos">
-        <div class="bloc-info">
-            <h2>Médecin</h2>
-            <p>Nom : </p>
-            <p>Prénom : </p>
-            <p>Date de naissance : </p>
-            <p>Sexe :  </p>
-            <p>Adresse : </p>
-            <p>Email :  </p>
-        </div>
 
         <div class="bloc-info">
-            <h2>Aide-soignant</h2>
-            <p>Nom : </p>
-            <p>Prénom : </p>
-            <p>Date de naissance : </p>
-            <p>Sexe :  </p>
-            <p>Adresse : </p>
-            <p>Email : </p>
+           <h2>Patient</h2>
+            <p>Nom : <span id="p-nom"></span></p>
+            <p>Prénom : <span id="p-prenom"></span></p>
+            <p>Date de naissance : <span id="p-ddn"></span></p>
+            <p>Sexe : <span id="p-sexe"></span></p>
+            <p>Adresse postale : <span id="p-adresse"></span></p>
+            <p>Adresse électronique : <span id="p-mail"></span></p>
         </div>
+        
+        <div class="bloc-info">
+           <div class="bloc-info">
+                <h2>Médecin traitant</h2>
+                <p>Nom : <span id="med-nom"></span></p>
+                <p>Prénom : <span id="med-prenom"></span></p>
+                <p>Date de naissance : <span id="med-ddn"></span></p>
+                <p>Sexe : <span id="med-sexe"></span></p>
+                <p>Adresse postale : <span id="med-adresse"></span></p>
+                <p>Adresse électronique : <span id="med-mail"></span></p>
+          </div>
+
+        </div>
+
     </div>
 
     <h2 class="section-title">Prescription</h2>
-    <iframe class="pdf-viewer" src="<!-- URL du PDF chargé depuis la BD -->"></iframe>
+    <iframe class="pdf-viewer" src="// URL du PDF chargé depuis la BD //"></iframe>
 
     <h2 class="section-title">Suivi du traitement</h2>
  
  <div style="display: flex; gap: 20px; align-items: flex-start;">
 
-  <!-- CALENDRIER -->
+// CALENDRIER //
   <div class="calendar" id="calendar-wrapper">
       <div id="os-calendar" class="os-calendar"></div>
   </div>
 
-  <!-- PANNEAU DE DETAILS (caché par défaut) -->
+// PANNEAU DE DETAILS (caché par défaut) //
   <aside id="details-panel" class="details-panel" aria-hidden="true" style="display:none;">
       <h3 id="details-title">Détails du jour</h3>
       <div id="details-content"></div>
@@ -314,8 +321,75 @@ font-size: 16px;
 
 
 </div>
- <!-- POUR LE CALENDRIER -->
-    <script>
+
+<script>
+
+const API_KEY = "9769a0eab09284d4bfeef45e4103642cf00b1b17f15f65afeb4f336890e37e63";
+const API_URL_BASE = "https://apidatabasesae-aee3egcmdke2b6a2.germanywestcentral-01.azurewebsites.net/api";
+
+// récupérer id patient depuis l'URL
+const params = new URLSearchParams(window.location.search);
+const idPatient = params.get("id");
+
+async function chargerInfos() {
+    try {
+        // ---- 1. Charger infos patient ----
+        const repPatient = await fetch(`${API_URL_BASE}/patients/${idPatient}`, {
+            headers: { "api_key": API_KEY }
+        });
+
+        if (!repPatient.ok) throw new Error("Patient introuvable");
+
+        const patient = await repPatient.json();
+
+        // ---- remplir infos patient ----
+        document.getElementById("p-nom").textContent = patient.nomFamille;
+        document.getElementById("p-prenom").textContent = patient.prenom;
+        document.getElementById("p-ddn").textContent = patient.date_naissance;
+        document.getElementById("p-sexe").textContent = patient.sexe;
+        document.getElementById("p-mail").textContent = patient.adresse_electronique;
+        document.getElementById("p-adresse").textContent = patient.adresse_postale;
+
+
+        // ================================
+        //           MÉDECIN
+        // ================================
+        if (!patient.fk_medecin_traitant) {
+            // Aucun médecin assigné
+            document.getElementById("med-nom").textContent = "Aucun médecin";
+            document.getElementById("med-prenom").textContent = "-";
+            document.getElementById("med-ddn").textContent = "-";
+            document.getElementById("med-sexe").textContent = "-";
+            document.getElementById("med-mail").textContent = "-";
+            document.getElementById("med-adresse").textContent = "-";
+        } else {
+            // Charger infos médecin
+            const repMed = await fetch(`${API_URL_BASE}/medecins/${patient.fk_medecin_traitant}`, {
+                headers: { "api_key": API_KEY }
+            });
+
+            const med = await repMed.json();
+
+            document.getElementById("med-nom").textContent = med.nomFamille;
+            document.getElementById("med-prenom").textContent = med.prenom;
+            document.getElementById("med-ddn").textContent = med.date_naissance;
+            document.getElementById("med-sexe").textContent = med.sexe;
+            document.getElementById("med-mail").textContent = med.adresse_electronique;
+            document.getElementById("med-adresse").textContent = med.adresse_postale;
+        }
+
+    } catch (err) {
+        console.error(err);
+        alert("Erreur lors du chargement du patient");
+    }
+}
+
+chargerInfos();
+
+        // ================================
+        // POUR LE CALENDRIER 
+        // ================================
+
         const calendarContainer = document.getElementById("os-calendar");
 
         const date = new Date();
@@ -411,10 +485,7 @@ function openDetails(day, month, year) {
     </script>
 </div>
 
-
-
-
-    <!-- Configuration de la boîte -->
+  //Configuration de la boîte //
     <h2 class="section-title">Configuration de la boîte</h2>
 <div class="box-config">
 
@@ -465,10 +536,9 @@ function openDetails(day, month, year) {
     </div>
 </div>
 
-<!-- Alertes -->
+// Alertes //
 <h2 class="alert-title">Alertes</h2> 
 <div class="alert-box">Aucune alerte pour le moment</div>
-
 
 </body>
 </html>

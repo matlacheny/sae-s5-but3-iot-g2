@@ -1,0 +1,51 @@
+.os-calendar {
+  background: #fff;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  width: 350px;
+}
+
+.cal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.nav-btn {
+  background: none;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.cal-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 8px;
+  text-align: center;
+}
+
+.day-name {
+  font-weight: bold;
+  color: #444;
+}
+
+.empty {
+  height: 40px;
+}
+
+.day {
+  padding: 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  background: #f2f2f2;
+  transition: 0.2s;
+}
+
+.day:hover {
+  background: #cfe3ff;
+}

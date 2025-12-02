@@ -1,3 +1,5 @@
+
+<!-- 
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -91,7 +93,6 @@
             background-color: #f0f8ff;
         }
 
-
 /* pour colorier en bleu quand le medecin s assigne un patient */
        .selected-patient {
     background-color: #cfe3ff !important;
@@ -179,14 +180,9 @@
     <span style="margin-left:8px;">Vos patients</span>
     </div>
 
-
-
 </div>
 
 <br/>
-
-
-
 
 
 <script>
@@ -194,7 +190,7 @@
     const API_KEY = "9769a0eab09284d4bfeef45e4103642cf00b1b17f15f65afeb4f336890e37e63";
     const API_URL_BASE = "https://apidatabasesae-aee3egcmdke2b6a2.germanywestcentral-01.azurewebsites.net/api";
 
-    // ID du médecin connecté (à remplacer + tard par votre système de connexion)
+    // ID du médecin connecté (à remplacer + tard par notre système de connexion)
     const idMedecin = "med1";
 
     const patientListDiv = document.querySelector(".patient-list");
@@ -252,10 +248,15 @@
         btnProfil.className = "profile-btn";
         btnProfil.textContent = "Afficher profil";
 
-       btnProfil.addEventListener("click", () => {
-window.location.href = `PageProfilMedecin2.html?id=${p.id_patient}`;
-    });
-
+     btnProfil.addEventListener("click", () => {
+    if (p.fk_medecin_traitant === idMedecin) {
+        // Accès autorisé
+        window.location.href = `PageProfilMedecin2.html?id=${p.id_patient}`;
+    } else {
+        // Popup avertissement
+        alert("Vous ne pouvez pas accéder à ce profil tant que vous ne vous êtes pas assigné à ce patient.");
+    }
+});
 
         div.appendChild(btnAssign);
         div.appendChild(label);
@@ -282,7 +283,6 @@ window.location.href = `PageProfilMedecin2.html?id=${p.id_patient}`;
 
     // Charger la liste initiale
     chargerPatients();
-
 
 
 function toggleAssign(p, div, btn) {
@@ -356,20 +356,8 @@ async function mettreAJourAssignation(idPatient, nouveauMedecin) {
         console.error("Erreur API assignation :", e);
     }
 }
-
-
-    
+  
 </script>
-
-
-
-
-
-
-
-
-
-
-
 </body>
 </html>  
+-->

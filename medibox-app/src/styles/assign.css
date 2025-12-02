@@ -1,0 +1,144 @@
+/* ==== PAGE ASSIGNATION AIDE-SOIGNANT ==== */
+
+.assign-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 40px 20px;
+  font-family: Arial, sans-serif;
+  background-color: #f8f8f8;
+  min-height: 100vh;
+}
+
+.assign-container h1 {
+  color: #2b4c7e;
+  text-align: center;
+  margin-bottom: 20px;
+  font-size: 28px;
+}
+
+.patient-info {
+  text-align: center;
+  color: #666;
+  margin-bottom: 30px;
+  font-size: 16px;
+}
+
+.patient-info strong {
+  color: #1e3d59;
+  font-size: 18px;
+}
+
+/* Liste des aides-soignants */
+.as-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-bottom: 30px;
+}
+
+.as-card {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-left: 5px solid #4a73d9;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.as-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+.as-info {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.as-name {
+  font-weight: bold;
+  font-size: 1.1em;
+  color: #1e3d59;
+}
+
+.as-detail {
+  color: #666;
+  font-size: 0.9em;
+}
+
+/* Boutons */
+.btn-choose {
+  background-color: #4a73d9;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background 0.3s;
+  font-weight: 500;
+}
+
+.btn-choose:hover {
+  background-color: #365dbf;
+}
+
+.btn-back {
+  display: block;
+  margin: 30px auto 0;
+  background-color: white;
+  color: #4a73d9;
+  border: 2px solid #4a73d9;
+  padding: 10px 25px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s;
+  font-weight: 500;
+}
+
+.btn-back:hover {
+  background-color: #f0f8ff;
+}
+
+/* Messages */
+.loading {
+  text-align: center;
+  font-style: italic;
+  color: #888;
+  padding: 40px;
+  font-size: 16px;
+}
+
+.error {
+  color: #d32f2f;
+  text-align: center;
+  font-weight: bold;
+  background-color: #ffebee;
+  padding: 20px;
+  border-radius: 8px;
+  border: 2px solid #ef5350;
+  margin: 20px 0;
+}
+
+/* ==== RESPONSIVE ==== */
+
+@media (max-width: 768px) {
+  .assign-container {
+    padding: 20px 10px;
+  }
+
+  .as-card {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+  }
+
+  .btn-choose {
+    width: 100%;
+  }
+}

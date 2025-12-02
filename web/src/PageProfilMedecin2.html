@@ -1,3 +1,4 @@
+<!---
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -265,7 +266,7 @@ font-size: 16px;
 <body>
 
 <header>
-    <img src="../image/Logo.webp" alt="Logo Medibox">
+    <img src="../image/logoMedibox.png" alt="Logo Medibox">
         <h1> Espace Medecin </h1>
 </header>
 
@@ -300,18 +301,18 @@ font-size: 16px;
 </br> 
 
 
-<iframe class="pdf-viewer" src="<!-- URL du PDF chargé depuis la BD -->"></iframe>
+<iframe class="pdf-viewer" src=" // URL du PDF chargé depuis la BD //"></iframe>
 
     <h2 class="section-title">Suivi du traitement</h2>
  
  <div style="display: flex; gap: 20px; align-items: flex-start;">
 
-  <!-- CALENDRIER -->
+ // CALENDRIER //
   <div class="calendar" id="calendar-wrapper">
       <div id="os-calendar" class="os-calendar"></div>
   </div>
 
-  <!-- PANNEAU DE DETAILS (caché par défaut) -->
+ // PANNEAU DE DETAILS (caché par défaut) //
   <aside id="details-panel" class="details-panel" aria-hidden="true" style="display:none;">
       <h3 id="details-title">Détails du jour</h3>
       <div id="details-content"></div>
@@ -320,7 +321,6 @@ font-size: 16px;
 
 
 </div>
- <!-- POUR LE CALENDRIER -->
     <script>
 
 
@@ -455,7 +455,7 @@ calendarContainer.addEventListener('click', function (e) {
 
 
 function openDetails(day, month, year) {
-    // titre format jour uniquement (tu peux remplacer par `${day}/${month+1}/${year}` si tu veux)
+    // titre format jour uniquement ( peux remplacer par `${day}/${month+1}/${year}` si tu veux)
     const title = `Détails du ${day}/${month}/${year}`;
 
     // afficher le panneau (il était caché par défaut)
@@ -480,3 +480,5 @@ function openDetails(day, month, year) {
         renderCalendar(month, year);
     </script>
 </div>
+
+-->
