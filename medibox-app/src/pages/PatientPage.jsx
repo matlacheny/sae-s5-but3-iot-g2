@@ -21,6 +21,9 @@ const PatientPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // État pour la prescription
+  const [prescriptionUrl, setPrescriptionUrl] = useState('');
+
   useEffect(() => {
     console.log('=== DEBUG PatientPage ===');
     console.log('User complet:', user);
@@ -28,12 +31,26 @@ const PatientPage = () => {
     
     if (idPatient) {
       chargerDonneesPatient();
+      chargerPrescription();
     } else {
       console.error('ERREUR: Pas d\'ID patient trouvé');
       setError('Impossible de récupérer l\'identifiant du patient');
       setLoading(false);
     }
   }, [idPatient]);
+
+  // Charger la prescription du patient
+  const chargerPrescription = () => {
+    const prescKey = `prescription_patient_${idPatient}`;
+    const savedPrescription = localStorage.getItem(prescKey);
+    
+    if (savedPrescription) {
+      setPrescriptionUrl(savedPrescription);
+      console.log('Prescription trouvée pour le patient:', idPatient);
+    } else {
+      console.log('Aucune prescription pour ce patient');
+    }
+  };
 
   const chargerDonneesPatient = async () => {
     setLoading(true);
@@ -121,7 +138,6 @@ const PatientPage = () => {
     setShowModal(true);
   };
 
-  // Affichage pendant le chargement
   if (loading) {
     return (
       <div style={{ 
@@ -140,7 +156,6 @@ const PatientPage = () => {
     );
   }
 
-  // Affichage en cas d'erreur
   if (error) {
     return (
       <div style={{ 
@@ -236,10 +251,29 @@ const PatientPage = () => {
         }
         .pdf-viewer {
           width: 100%;
-          height: 400px;
-          border: 1px solid #ccc;
+          height: 500px;
+          border: 2px solid #ddd;
           border-radius: 8px;
           margin-bottom: 40px;
+          background-color: #f9f9f9;
+        }
+        .no-prescription {
+          width: 100%;
+          height: 400px;
+          border: 2px dashed #ccc;
+          border-radius: 8px;
+          margin-bottom: 40px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          flex-direction: column;
+          background-color: #fafafa;
+          color: #999;
+          font-style: italic;
+        }
+        .no-prescription-icon {
+          font-size: 64px;
+          margin-bottom: 15px;
         }
         .calendar {
           background-color: white;
@@ -326,6 +360,24 @@ const PatientPage = () => {
         .day:hover {
           background: #cfe3ff;
         }
+        .prescription-status {
+          display: inline-block;
+          padding: 8px 15px;
+          border-radius: 20px;
+          font-size: 14px;
+          font-weight: bold;
+          margin-bottom: 15px;
+        }
+        .prescription-status.available {
+          background-color: #d4edda;
+          color: #155724;
+          border: 1px solid #c3e6cb;
+        }
+        .prescription-status.unavailable {
+          background-color: #f8d7da;
+          color: #721c24;
+          border: 1px solid #f5c6cb;
+        }
       `}</style>
 
       <header>
@@ -399,7 +451,34 @@ const PatientPage = () => {
         </div>
 
         <h2 className="section-title">Prescription</h2>
-        <iframe className="pdf-viewer" src=""></iframe>
+        
+        {prescriptionUrl ? (
+          <>
+            <span className="prescription-status available">
+              ✓ Prescription disponible
+            </span>
+            <iframe 
+              className="pdf-viewer" 
+              src={prescriptionUrl}
+              title="Votre prescription médicale"
+            />
+          </>
+        ) : (
+          <>
+            <span className="prescription-status unavailable">
+              ⚠ Aucune prescription
+            </span>
+            <div className="no-prescription">
+              <div className="no-prescription-icon">📋</div>
+              <p style={{ fontSize: '16px', margin: '10px 0' }}>
+                Aucune prescription n'a encore été ajoutée par votre médecin
+              </p>
+              <p style={{ fontSize: '14px', margin: 0 }}>
+                Votre prescription apparaîtra ici dès que votre médecin l'aura téléversée
+              </p>
+            </div>
+          </>
+        )}
 
         <h2 className="section-title">Suivi du traitement</h2>
         <div className="calendar">
