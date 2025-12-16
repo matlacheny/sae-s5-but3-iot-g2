@@ -10,7 +10,6 @@ const AideSoignantProfilePage = () => {
   const { user } = useAuth();
   const [searchParams] = useSearchParams();
   
-  // CORRECTION : On récupère l'ID du patient depuis l'URL
   const idPatient = searchParams.get("id");
 
   const [patient, setPatient] = useState(null);
@@ -22,6 +21,20 @@ const AideSoignantProfilePage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // État pour la configuration de la boîte
+  const [compartiments, setCompartiments] = useState([
+    { num: 1, medicament: '', heure: '', quantite: '' },
+    { num: 2, medicament: '', heure: '', quantite: '' },
+    { num: 3, medicament: '', heure: '', quantite: '' },
+    { num: 4, medicament: '', heure: '', quantite: '' },
+    { num: 5, medicament: '', heure: '', quantite: '' },
+    { num: 6, medicament: '', heure: '', quantite: '' }
+  ]);
+  
+  const [isEditing, setIsEditing] = useState(false);
+  const [isSaved, setIsSaved] = useState(false);
+  const [saveMessage, setSaveMessage] = useState('');
+
   useEffect(() => {
     console.log('=== DEBUG AideSoignantProfilePage ===');
     console.log('User connecté:', user);
@@ -29,11 +42,32 @@ const AideSoignantProfilePage = () => {
     
     if (idPatient) {
       chargerInfos();
+      chargerConfiguration();
     } else {
       setError('Aucun patient sélectionné');
       setLoading(false);
     }
   }, [idPatient]);
+
+  // Charger la configuration sauvegardée depuis localStorage
+  const chargerConfiguration = () => {
+    const configKey = `medibox_config_patient_${idPatient}`;
+    const savedConfig = localStorage.getItem(configKey);
+    
+    if (savedConfig) {
+      try {
+        const config = JSON.parse(savedConfig);
+        setCompartiments(config);
+        setIsSaved(true);
+        setIsEditing(false);
+        console.log('Configuration chargée:', config);
+      } catch (e) {
+        console.error('Erreur lors du chargement de la configuration:', e);
+      }
+    } else {
+      setIsEditing(true); // Mode édition par défaut si pas de config
+    }
+  };
 
   const chargerInfos = async () => {
     setLoading(true);
@@ -53,7 +87,6 @@ const AideSoignantProfilePage = () => {
       console.log('Patient chargé:', patientData);
       setPatient(patientData);
 
-      // Charger le médecin si assigné
       if (patientData.fk_medecin_traitant) {
         console.log('Chargement médecin:', patientData.fk_medecin_traitant);
         const repMed = await fetch(`${API_URL_BASE}/medecins/${patientData.fk_medecin_traitant}`, {
@@ -78,6 +111,52 @@ const AideSoignantProfilePage = () => {
       setError(err.message);
       setLoading(false);
     }
+  };
+
+  // Gérer les changements dans les champs de compartiment
+  const handleCompartimentChange = (index, field, value) => {
+    const newCompartiments = [...compartiments];
+    newCompartiments[index][field] = value;
+    setCompartiments(newCompartiments);
+  };
+
+  // Enregistrer la configuration
+  const handleEnregistrer = () => {
+    const configKey = `medibox_config_patient_${idPatient}`;
+    
+    try {
+      localStorage.setItem(configKey, JSON.stringify(compartiments));
+      setIsSaved(true);
+      setIsEditing(false);
+      setSaveMessage('✓ Configuration enregistrée avec succès !');
+      
+      console.log('Configuration enregistrée:', compartiments);
+      
+      setTimeout(() => {
+        setSaveMessage('');
+      }, 3000);
+    } catch (e) {
+      console.error('Erreur lors de l\'enregistrement:', e);
+      setSaveMessage('✗ Erreur lors de l\'enregistrement');
+      
+      setTimeout(() => {
+        setSaveMessage('');
+      }, 3000);
+    }
+  };
+
+  // Passer en mode modification
+  const handleModifier = () => {
+    setIsEditing(true);
+    setIsSaved(false);
+    setSaveMessage('');
+  };
+
+  // Annuler les modifications
+  const handleAnnuler = () => {
+    chargerConfiguration(); // Recharger la dernière config sauvegardée
+    setIsEditing(false);
+    setSaveMessage('');
   };
 
   const renderCalendar = (m, y) => {
@@ -105,7 +184,6 @@ const AideSoignantProfilePage = () => {
     setShowDetails(true);
   };
 
-  // Gestion du chargement
   if (loading) {
     return (
       <div style={{ 
@@ -124,7 +202,6 @@ const AideSoignantProfilePage = () => {
     );
   }
 
-  // Gestion des erreurs
   if (error) {
     return (
       <div style={{ 
@@ -296,7 +373,7 @@ const AideSoignantProfilePage = () => {
           flex-direction: column;
           align-items: center;
           gap: 10px;
-          margin-bottom: 30px;
+          margin-bottom: 20px;
         }
         .compartiments-row {
           display: flex;
@@ -307,8 +384,8 @@ const AideSoignantProfilePage = () => {
         .compartiment {
           width: 140px;
           height: 160px;
-          background-color: #cfe3ff;
-          border: 2px solid #4a73d9;
+          background-color: ${isEditing ? '#cfe3ff' : '#e8f4ff'};
+          border: 2px solid ${isEditing ? '#4a73d9' : '#7ba3d9'};
           border-radius: 8px;
           display: flex;
           flex-direction: column;
@@ -318,11 +395,13 @@ const AideSoignantProfilePage = () => {
           font-size: 16px;
           padding: 5px;
           box-sizing: border-box;
+          transition: all 0.3s;
         }
         .compartiment-title {
           font-size: 14px;
           font-weight: bold;
           margin-bottom: 6px;
+          color: ${isEditing ? '#1e3d59' : '#5a7a99'};
         }
         .compartiment input {
           width: 90%;
@@ -332,6 +411,88 @@ const AideSoignantProfilePage = () => {
           border-radius: 4px;
           border: 1px solid #999;
           box-sizing: border-box;
+          background-color: ${isEditing ? 'white' : '#f5f5f5'};
+          cursor: ${isEditing ? 'text' : 'not-allowed'};
+        }
+        .config-buttons {
+          display: flex;
+          gap: 15px;
+          justify-content: center;
+          margin-top: 20px;
+          margin-bottom: 30px;
+        }
+        .btn-enregistrer {
+          background-color: #28a745;
+          color: white;
+          border: none;
+          padding: 12px 30px;
+          border-radius: 8px;
+          cursor: pointer;
+          font-size: 16px;
+          font-weight: bold;
+          transition: background 0.3s;
+        }
+        .btn-enregistrer:hover {
+          background-color: #218838;
+        }
+        .btn-modifier {
+          background-color: #ffc107;
+          color: #333;
+          border: none;
+          padding: 12px 30px;
+          border-radius: 8px;
+          cursor: pointer;
+          font-size: 16px;
+          font-weight: bold;
+          transition: background 0.3s;
+        }
+        .btn-modifier:hover {
+          background-color: #e0a800;
+        }
+        .btn-annuler {
+          background-color: #dc3545;
+          color: white;
+          border: none;
+          padding: 12px 30px;
+          border-radius: 8px;
+          cursor: pointer;
+          font-size: 16px;
+          font-weight: bold;
+          transition: background 0.3s;
+        }
+        .btn-annuler:hover {
+          background-color: #c82333;
+        }
+        .save-message {
+          text-align: center;
+          padding: 10px;
+          border-radius: 8px;
+          margin-bottom: 20px;
+          font-weight: bold;
+          animation: fadeIn 0.3s;
+        }
+        .save-message.success {
+          background-color: #d4edda;
+          color: #155724;
+          border: 1px solid #c3e6cb;
+        }
+        .save-message.error {
+          background-color: #f8d7da;
+          color: #721c24;
+          border: 1px solid #f5c6cb;
+        }
+        @keyframes fadeIn {
+          from { opacity: 0; transform: translateY(-10px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        .config-status {
+          text-align: center;
+          padding: 8px;
+          background-color: #e7f3ff;
+          border-radius: 6px;
+          margin-bottom: 15px;
+          font-size: 14px;
+          color: #0066cc;
         }
         .alert-title {
           color: red;
@@ -420,28 +581,96 @@ const AideSoignantProfilePage = () => {
         </div>
 
         <h2 className="section-title">Configuration de la boîte</h2>
+        
+        {isSaved && !isEditing && (
+          <div className="config-status">
+            🔒 Configuration enregistrée - Cliquez sur "Modifier" pour apporter des changements
+          </div>
+        )}
+
+        {saveMessage && (
+          <div className={`save-message ${saveMessage.includes('✓') ? 'success' : 'error'}`}>
+            {saveMessage}
+          </div>
+        )}
+
         <div className="box-config">
           <div className="compartiments-row">
-            {[1, 2, 3].map(num => (
-              <div key={num} className="compartiment">
-                <div className="compartiment-title">Compartiment {num}</div>
-                <input type="text" placeholder="Nom du médicament" />
-                <input type="time" />
-                <input type="number" min="1" placeholder="Quantité" />
+            {compartiments.slice(0, 3).map((comp, index) => (
+              <div key={comp.num} className="compartiment">
+                <div className="compartiment-title">Compartiment {comp.num}</div>
+                <input 
+                  type="text" 
+                  placeholder="Nom du médicament"
+                  value={comp.medicament}
+                  onChange={(e) => handleCompartimentChange(index, 'medicament', e.target.value)}
+                  disabled={!isEditing}
+                />
+                <input 
+                  type="time"
+                  value={comp.heure}
+                  onChange={(e) => handleCompartimentChange(index, 'heure', e.target.value)}
+                  disabled={!isEditing}
+                />
+                <input 
+                  type="number" 
+                  min="1" 
+                  placeholder="Quantité"
+                  value={comp.quantite}
+                  onChange={(e) => handleCompartimentChange(index, 'quantite', e.target.value)}
+                  disabled={!isEditing}
+                />
               </div>
             ))}
           </div>
 
           <div className="compartiments-row">
-            {[4, 5, 6].map(num => (
-              <div key={num} className="compartiment">
-                <div className="compartiment-title">Compartiment {num}</div>
-                <input type="text" placeholder="Nom du médicament" />
-                <input type="time" />
-                <input type="number" min="1" placeholder="Quantité" />
+            {compartiments.slice(3, 6).map((comp, index) => (
+              <div key={comp.num} className="compartiment">
+                <div className="compartiment-title">Compartiment {comp.num}</div>
+                <input 
+                  type="text" 
+                  placeholder="Nom du médicament"
+                  value={comp.medicament}
+                  onChange={(e) => handleCompartimentChange(index + 3, 'medicament', e.target.value)}
+                  disabled={!isEditing}
+                />
+                <input 
+                  type="time"
+                  value={comp.heure}
+                  onChange={(e) => handleCompartimentChange(index + 3, 'heure', e.target.value)}
+                  disabled={!isEditing}
+                />
+                <input 
+                  type="number" 
+                  min="1" 
+                  placeholder="Quantité"
+                  value={comp.quantite}
+                  onChange={(e) => handleCompartimentChange(index + 3, 'quantite', e.target.value)}
+                  disabled={!isEditing}
+                />
               </div>
             ))}
           </div>
+        </div>
+
+        <div className="config-buttons">
+          {isEditing ? (
+            <>
+              <button className="btn-enregistrer" onClick={handleEnregistrer}>
+                 Enregistrer
+              </button>
+              {isSaved && (
+                <button className="btn-annuler" onClick={handleAnnuler}>
+                  ✖ Annuler
+                </button>
+              )}
+            </>
+          ) : (
+            <button className="btn-modifier" onClick={handleModifier}>
+              ✏️ Modifier
+            </button>
+          )}
         </div>
 
         <h2 className="alert-title">Alertes</h2>

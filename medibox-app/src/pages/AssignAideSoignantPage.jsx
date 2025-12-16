@@ -11,9 +11,7 @@ const AssignAideSoignantPage = () => {
   const navigate = useNavigate();
 const { user } = useAuth();
 
- // const idPatient = searchParams.get('idPatient') || 'pat1';
   const idPatient = user?.id || '';
-  //const idPatient = searchParams.get('idPatient') || 'pat1';
 
   const [aidesSoignants, setAidesSoignants] = useState([]);
   const [loading, setLoading] = useState(true);
