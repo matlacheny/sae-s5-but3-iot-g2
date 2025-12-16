@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { useSearchParams, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../AuthContext';
+import LogoutButton from '../LogoutButton';
 
 const API_KEY = "9769a0eab09284d4bfeef45e4103642cf00b1b17f15f65afeb4f336890e37e63";
 const API_URL_BASE = "https://apidatabasesae-aee3egcmdke2b6a2.germanywestcentral-01.azurewebsites.net/api";
 
 const PatientPage = () => {
-  const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const idPatient = searchParams.get('idPatient') || 'pat1';
+  const { user } = useAuth();
+  const idPatient = user?.id;
 
   const [patient, setPatient] = useState(null);
   const [aideSoignant, setAideSoignant] = useState(null);
@@ -16,37 +18,70 @@ const PatientPage = () => {
   const [modalContent, setModalContent] = useState({ date: '', medications: [] });
   const [month, setMonth] = useState(new Date().getMonth());
   const [year, setYear] = useState(new Date().getFullYear());
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    chargerDonneesPatient();
+    console.log('=== DEBUG PatientPage ===');
+    console.log('User complet:', user);
+    console.log('ID Patient:', idPatient);
+    
+    if (idPatient) {
+      chargerDonneesPatient();
+    } else {
+      console.error('ERREUR: Pas d\'ID patient trouvé');
+      setError('Impossible de récupérer l\'identifiant du patient');
+      setLoading(false);
+    }
   }, [idPatient]);
 
   const chargerDonneesPatient = async () => {
+    setLoading(true);
+    setError(null);
+    
     try {
+      console.log('Tentative de chargement du patient:', idPatient);
+      console.log('URL appelée:', `${API_URL_BASE}/patients/${idPatient}`);
+      
       const response = await fetch(`${API_URL_BASE}/patients/${idPatient}`, {
         headers: { "api_key": API_KEY }
       });
       
-      if (!response.ok) throw new Error("Erreur récupération patient");
+      console.log('Status response:', response.status);
+      
+      if (!response.ok) {
+        throw new Error(`Erreur HTTP ${response.status}: ${response.statusText}`);
+      }
+      
       const patientData = await response.json();
+      console.log('Patient chargé avec succès:', patientData);
       setPatient(patientData);
 
       if (patientData.fk_aide_soignant) {
         setShowInfoAS(true);
         await chargerInfoAideSoignant(patientData.fk_aide_soignant);
       }
+      
+      setLoading(false);
     } catch (error) {
-      console.error(error);
+      console.error('ERREUR lors du chargement:', error);
+      setError('Erreur lors du chargement du patient: ' + error.message);
+      setLoading(false);
     }
   };
 
   const chargerInfoAideSoignant = async (idAS) => {
     try {
+      console.log('Chargement aide-soignant:', idAS);
       const response = await fetch(`${API_URL_BASE}/aidesoignants/${idAS}`, {
         headers: { "api_key": API_KEY }
       });
-      const asData = await response.json();
-      setAideSoignant(asData);
+      
+      if (response.ok) {
+        const asData = await response.json();
+        console.log('Aide-soignant chargé:', asData);
+        setAideSoignant(asData);
+      }
     } catch (error) {
       console.error("Erreur chargement AS", error);
     }
@@ -85,6 +120,73 @@ const PatientPage = () => {
     });
     setShowModal(true);
   };
+
+  // Affichage pendant le chargement
+  if (loading) {
+    return (
+      <div style={{ 
+        fontFamily: 'Arial, sans-serif', 
+        display: 'flex', 
+        justifyContent: 'center', 
+        alignItems: 'center', 
+        height: '100vh',
+        backgroundColor: '#f8f8f8'
+      }}>
+        <div style={{ textAlign: 'center' }}>
+          <h2>Chargement des données...</h2>
+          <p>Patient ID: {idPatient || 'Non trouvé'}</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Affichage en cas d'erreur
+  if (error) {
+    return (
+      <div style={{ 
+        fontFamily: 'Arial, sans-serif', 
+        display: 'flex', 
+        justifyContent: 'center', 
+        alignItems: 'center', 
+        height: '100vh',
+        backgroundColor: '#f8f8f8'
+      }}>
+        <div style={{ 
+          backgroundColor: 'white', 
+          padding: '30px', 
+          borderRadius: '8px',
+          boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+          maxWidth: '500px'
+        }}>
+          <h2 style={{ color: '#dc3545' }}>⚠️ Erreur</h2>
+          <p>{error}</p>
+          <div style={{ marginTop: '20px', padding: '15px', backgroundColor: '#f8f9fa', borderRadius: '4px' }}>
+            <strong>Informations de débogage:</strong>
+            <pre style={{ fontSize: '12px', overflow: 'auto' }}>
+              {JSON.stringify({ 
+                idPatient, 
+                user: user ? { id: user.id, role: user.role } : 'null' 
+              }, null, 2)}
+            </pre>
+          </div>
+          <button
+            onClick={() => window.location.reload()}
+            style={{
+              marginTop: '20px',
+              padding: '10px 20px',
+              backgroundColor: '#4a73d9',
+              color: 'white',
+              border: 'none',
+              borderRadius: '5px',
+              cursor: 'pointer'
+            }}
+          >
+            Réessayer
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   const { monthName, weekDays, offset, daysInMonth } = renderCalendar(month, year);
 
@@ -229,13 +331,14 @@ const PatientPage = () => {
       <header>
         <img src="/image/Logo.webp" alt="Logo Medibox" />
         <h1>Espace Patient</h1>
+        <LogoutButton />
       </header>
 
       <div className="container">
         <div className="infos">
           <div className="bloc-info">
             <h2>Médecin</h2>
-            <p>Nom : </p>
+            <p>Nom : {patient?.fk_medecin_traitant || 'Non assigné'}</p>
             <p>Prénom : </p>
             <p>Date de naissance : </p>
             <p>Sexe : </p>

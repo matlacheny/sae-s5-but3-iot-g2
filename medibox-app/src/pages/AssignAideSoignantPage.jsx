@@ -1,13 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
+import { useAuth } from '../AuthContext';
+import LogoutButton from '../LogoutButton';
 
 const API_KEY = "9769a0eab09284d4bfeef45e4103642cf00b1b17f15f65afeb4f336890e37e63";
 const API_BASE = "https://apidatabasesae-aee3egcmdke2b6a2.germanywestcentral-01.azurewebsites.net/api";
-
+ 
 const AssignAideSoignantPage = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const idPatient = searchParams.get('idPatient') || 'pat1';
+const { user } = useAuth();
+
+ // const idPatient = searchParams.get('idPatient') || 'pat1';
+  const idPatient = user?.id || '';
+  //const idPatient = searchParams.get('idPatient') || 'pat1';
 
   const [aidesSoignants, setAidesSoignants] = useState([]);
   const [loading, setLoading] = useState(true);

@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../AuthContext';
+import LogoutButton from '../LogoutButton';
 
 const API_KEY = "9769a0eab09284d4bfeef45e4103642cf00b1b17f15f65afeb4f336890e37e63";
 const API_URL_BASE = "https://apidatabasesae-aee3egcmdke2b6a2.germanywestcentral-01.azurewebsites.net/api";
@@ -128,6 +130,8 @@ const AideSoignantListPage = () => {
       <header>
         <img src="/image/logoMedibox.png" alt="Logo Medibox" />
         <h1>Espace Aide-Soignant</h1>
+        <LogoutButton />
+        
       </header>
 
       <div className="container">

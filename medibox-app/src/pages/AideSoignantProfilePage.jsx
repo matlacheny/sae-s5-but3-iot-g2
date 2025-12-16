@@ -1,11 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import { useAuth } from '../AuthContext';
+import LogoutButton from '../LogoutButton';
 
 const API_KEY = "9769a0eab09284d4bfeef45e4103642cf00b1b17f15f65afeb4f336890e37e63";
 const API_URL_BASE = "https://apidatabasesae-aee3egcmdke2b6a2.germanywestcentral-01.azurewebsites.net/api";
 
 const AideSoignantProfilePage = () => {
+  const { user } = useAuth();
   const [searchParams] = useSearchParams();
+  
+  // CORRECTION : On récupère l'ID du patient depuis l'URL
   const idPatient = searchParams.get("id");
 
   const [patient, setPatient] = useState(null);
@@ -14,37 +19,64 @@ const AideSoignantProfilePage = () => {
   const [showDetails, setShowDetails] = useState(false);
   const [month, setMonth] = useState(new Date().getMonth());
   const [year, setYear] = useState(new Date().getFullYear());
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
+    console.log('=== DEBUG AideSoignantProfilePage ===');
+    console.log('User connecté:', user);
+    console.log('ID Patient depuis URL:', idPatient);
+    
     if (idPatient) {
       chargerInfos();
+    } else {
+      setError('Aucun patient sélectionné');
+      setLoading(false);
     }
   }, [idPatient]);
 
   const chargerInfos = async () => {
+    setLoading(true);
+    setError(null);
+    
     try {
+      console.log('Chargement du patient:', idPatient);
       const repPatient = await fetch(`${API_URL_BASE}/patients/${idPatient}`, {
         headers: { "api_key": API_KEY }
       });
 
-      if (!repPatient.ok) throw new Error("Patient introuvable");
+      if (!repPatient.ok) {
+        throw new Error(`Patient introuvable (HTTP ${repPatient.status})`);
+      }
+      
       const patientData = await repPatient.json();
+      console.log('Patient chargé:', patientData);
       setPatient(patientData);
 
+      // Charger le médecin si assigné
       if (patientData.fk_medecin_traitant) {
+        console.log('Chargement médecin:', patientData.fk_medecin_traitant);
         const repMed = await fetch(`${API_URL_BASE}/medecins/${patientData.fk_medecin_traitant}`, {
           headers: { "api_key": API_KEY }
         });
+        
         if (repMed.ok) {
           const med = await repMed.json();
+          console.log('Médecin chargé:', med);
           setMedecin(med);
+        } else {
+          console.warn('Médecin non trouvé');
+          setMedecin({ nomFamille: "Non trouvé" });
         }
       } else {
         setMedecin({ nomFamille: "Aucun médecin" });
       }
+      
+      setLoading(false);
     } catch (err) {
-      console.error(err);
-      alert("Erreur lors du chargement du patient");
+      console.error('ERREUR chargement:', err);
+      setError(err.message);
+      setLoading(false);
     }
   };
 
@@ -72,6 +104,64 @@ const AideSoignantProfilePage = () => {
     setSelectedDate(`${day}/${month + 1}/${year}`);
     setShowDetails(true);
   };
+
+  // Gestion du chargement
+  if (loading) {
+    return (
+      <div style={{ 
+        fontFamily: 'Arial, sans-serif', 
+        display: 'flex', 
+        justifyContent: 'center', 
+        alignItems: 'center', 
+        height: '100vh',
+        backgroundColor: '#f8f8f8'
+      }}>
+        <div style={{ textAlign: 'center' }}>
+          <h2>Chargement du profil patient...</h2>
+          <p>Patient ID: {idPatient || 'Non spécifié'}</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Gestion des erreurs
+  if (error) {
+    return (
+      <div style={{ 
+        fontFamily: 'Arial, sans-serif', 
+        display: 'flex', 
+        justifyContent: 'center', 
+        alignItems: 'center', 
+        height: '100vh',
+        backgroundColor: '#f8f8f8'
+      }}>
+        <div style={{ 
+          backgroundColor: 'white', 
+          padding: '30px', 
+          borderRadius: '8px',
+          boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+          maxWidth: '500px'
+        }}>
+          <h2 style={{ color: '#dc3545' }}>⚠️ Erreur</h2>
+          <p>{error}</p>
+          <button
+            onClick={() => window.history.back()}
+            style={{
+              marginTop: '20px',
+              padding: '10px 20px',
+              backgroundColor: '#4a73d9',
+              color: 'white',
+              border: 'none',
+              borderRadius: '5px',
+              cursor: 'pointer'
+            }}
+          >
+            Retour
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   const { monthName, weekDays, offset, daysInMonth } = renderCalendar(month, year);
 
@@ -259,6 +349,7 @@ const AideSoignantProfilePage = () => {
       <header>
         <img src="/image/Logo.webp" alt="Logo Medibox" />
         <h1>Espace Aide-Soignant</h1>
+        <LogoutButton />
       </header>
 
       <div className="container">
