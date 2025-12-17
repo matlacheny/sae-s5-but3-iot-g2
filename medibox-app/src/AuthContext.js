@@ -1,7 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-
-const API_KEY = "9769a0eab09284d4bfeef45e4103642cf00b1b17f15f65afeb4f336890e37e63";
-const API_PATH = "https://apidatabasesae-aee3egcmdke2b6a2.germanywestcentral-01.azurewebsites.net/api";
+import SERVER_CONFIG from './config/serverConfig';
 
 const AuthContext = createContext(null);
 
@@ -20,7 +18,12 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const savedUser = sessionStorage.getItem('mediapp_user');
     if (savedUser) {
-      setUser(JSON.parse(savedUser));
+      try {
+        setUser(JSON.parse(savedUser));
+      } catch (error) {
+        console.error('Erreur chargement session:', error);
+        sessionStorage.removeItem('mediapp_user');
+      }
     }
     setLoading(false);
   }, []);
@@ -32,37 +35,70 @@ export const AuthProvider = ({ children }) => {
       { name: 'aidesoignants', redirectTo: '/aide-soignant', idField: 'id_aide_soignant' }
     ];
 
+    // Récupérer l'URL du serveur depuis le Gist
+    let serverUrl;
+    try {
+      serverUrl = await SERVER_CONFIG.getServerUrl();
+      console.log(' [LOGIN] URL serveur récupérée:', serverUrl);
+    } catch (error) {
+      console.error('❌ [LOGIN] Impossible de récupérer la config:', error);
+      return { 
+        success: false, 
+        message: "Impossible de se connecter au serveur. Vérifiez votre connexion." 
+      };
+    }
+
     for (const role of roles) {
       try {
-        const response = await fetch(`${API_PATH}/${role.name}/${id}`, {
-          method: "GET",
+        console.log(`[LOGIN] Tentative ${role.name}/${id}`);
+        
+        const response = await fetch(`${serverUrl}/api/auth/login`, {
+          method: "POST",
           headers: {
-            api_key: API_KEY,
-            "Content-Type": "application/json"
-          }
+            "Content-Type": "application/json",
+            "ngrok-skip-browser-warning": "true" // Pour éviter l'avertissement Ngrok
+          },
+          body: JSON.stringify({
+            id: id,
+            password: password,
+            role: role.name
+          })
         });
 
+        console.log(`[LOGIN] Status: ${response.status}`);
+
         if (response.ok) {
-          const userData = await response.json();
+          const result = await response.json();
           
-          if (userData.mot_de_passe === password) {
-            const userInfo = {
-              id: userData[role.idField],
-              role: role.name,
-              redirectTo: role.redirectTo,
-              data: userData
-            };
-            
-            setUser(userInfo);
-            sessionStorage.setItem('mediapp_user', JSON.stringify(userInfo));
-            return { success: true, user: userInfo };
+          if (!result || !result.user) {
+            console.log(`[LOGIN] Pas de données pour ${role.name}`);
+            continue;
           }
+
+          const userData = result.user;
+          console.log(`[LOGIN] ✅ Succès ${role.name}`);
+          
+          const userInfo = {
+            id: userData[role.idField],
+            role: role.name,
+            redirectTo: role.redirectTo,
+            data: userData
+          };
+          
+          setUser(userInfo);
+          sessionStorage.setItem('mediapp_user', JSON.stringify(userInfo));
+          return { success: true, user: userInfo };
+        } else if (response.status === 401) {
+          console.log(`[LOGIN] ❌ Mot de passe incorrect pour ${role.name}`);
+        } else if (response.status === 404) {
+          console.log(`[LOGIN] ❌ Utilisateur non trouvé pour ${role.name}`);
         }
       } catch (error) {
-        console.error(`Erreur lors de la vérification pour ${role.name}:`, error);
+        console.error(`[LOGIN] Erreur ${role.name}:`, error);
       }
     }
 
+    console.log('❌ [LOGIN] Échec pour tous les rôles');
     return { success: false, message: "Identifiant ou mot de passe invalide" };
   };
 

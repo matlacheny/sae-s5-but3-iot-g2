@@ -1,6 +1,17 @@
+# Base de données
 DB_USER=adminsae
 DB_PASSWORD=";v#m-6h'mYj,qkC"
 DB_SERVER=saeiot2025.database.windows.net
 DB_NAME=saeiot2025
+
+# Configuration serveur
 PORT=3000
+PORT=3200
 API_KEY=9769a0eab09284d4bfeef45e4103642cf00b1b17f15f65afeb4f336890e37e63
+
+# API Azure
+API_BASE_URL=https://apidatabasesae-aee3egcmdke2b6a2.germanywestcentral-01.azurewebsites.net/api
+
+https://gist.githubusercontent.com/matlacheny/3876ccee933de9e78b9f473e555dc781/raw/config.json
+
+REACT_APP_SERVER_URL=https://heterotactic-unaccelerated-golden.ngrok-free.dev

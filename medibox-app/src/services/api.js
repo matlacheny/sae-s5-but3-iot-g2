@@ -1,6 +1,13 @@
+
+import SERVER_CONFIG from '../config/serverConfig';
+
+// Note : Votre serveur fait office de proxy vers l'API Azure
+// Il gère l'authentification et les connexions MQTT/WebSocket
+
 const API_CONFIG = {
-  key: "9769a0eab09284d4bfeef45e4103642cf00b1b17f15f65afeb4f336890e37e63",
-  baseUrl: "https://apidatabasesae-aee3egcmdke2b6a2.germanywestcentral-01.azurewebsites.net/api"
+  key: SERVER_CONFIG.API_KEY,
+  baseUrl: "https://apidatabasesae-aee3egcmdke2b6a2.germanywestcentral-01.azurewebsites.net/api",
+  serverUrl: SERVER_CONFIG.SERVER_URL
 };
 
 const apiService = {
@@ -10,7 +17,9 @@ const apiService = {
     "Content-Type": "application/json"
   }),
 
-  // PATIENTS
+  // ==========================================
+  // PATIENTS - Via API Azure directement
+  // ==========================================
   async getPatients(filters = {}) {
     const params = new URLSearchParams(filters);
     const response = await fetch(`${API_CONFIG.baseUrl}/patients?${params}`, {
@@ -48,7 +57,9 @@ const apiService = {
     return response.json();
   },
 
-  // AIDES-SOIGNANTS
+  // ==========================================
+  // AIDES-SOIGNANTS - Via API Azure
+  // ==========================================
   async getAllAidesSoignants() {
     const response = await fetch(`${API_CONFIG.baseUrl}/aidesoignants`, {
       headers: { "api_key": API_CONFIG.key }
@@ -65,12 +76,84 @@ const apiService = {
     return response.json();
   },
 
-  // MEDECINS
+  // ==========================================
+  // MEDECINS - Via API Azure
+  // ==========================================
   async getMedecin(id) {
     const response = await fetch(`${API_CONFIG.baseUrl}/medecins/${id}`, {
       headers: { "api_key": API_CONFIG.key }
     });
     if (!response.ok) throw new Error("Médecin introuvable");
+    return response.json();
+  },
+
+  // ==========================================
+  // PRESCRIPTIONS - Via le SERVEUR (nouveaux endpoints)
+  // ==========================================
+  
+  // Récupérer les prescriptions d'un patient via le serveur
+  async getPrescriptions(patientId) {
+    const response = await fetch(`${API_CONFIG.serverUrl}/api/prescriptions/${patientId}`, {
+      headers: apiService.getHeaders()
+    });
+    if (!response.ok) throw new Error("Erreur chargement prescriptions");
+    return response.json();
+  },
+
+  // Ajouter une prescription via le serveur
+  async addPrescription(patientId, prescriptionData) {
+    const response = await fetch(`${API_CONFIG.serverUrl}/api/prescriptions`, {
+      method: "POST",
+      headers: apiService.getHeaders(),
+      body: JSON.stringify({
+        patientId,
+        ...prescriptionData
+      })
+    });
+    if (!response.ok) throw new Error("Erreur ajout prescription");
+    return response.json();
+  },
+
+  // ==========================================
+  // SANTÉ DU SERVEUR
+  // ==========================================
+  async getServerHealth() {
+    try {
+      const response = await fetch(`${API_CONFIG.serverUrl}/api/health`);
+      if (!response.ok) throw new Error("Serveur non disponible");
+      return response.json();
+    } catch (error) {
+      console.error("Erreur de connexion au serveur:", error);
+      throw error;
+    }
+  },
+
+  // ==========================================
+  // PATIENTS D'UN AIDE-SOIGNANT - Via le serveur
+  // ==========================================
+  async getPatientsForAide(aideId) {
+    const response = await fetch(`${API_CONFIG.serverUrl}/api/patients/of/${aideId}`, {
+      headers: apiService.getHeaders()
+    });
+    if (!response.ok) throw new Error("Erreur chargement patients de l'aide");
+    return response.json();
+  },
+
+  // ==========================================
+  // ENVOI MANUEL D'ALERTE (pour tests)
+  // ==========================================
+  async sendManualAlert(aideId, patientId, alertType, message) {
+    const response = await fetch(`${API_CONFIG.serverUrl}/api/send-alert`, {
+      method: "POST",
+      headers: apiService.getHeaders(),
+      body: JSON.stringify({
+        aideId,
+        patientId,
+        alertType,
+        message
+      })
+    });
+    if (!response.ok) throw new Error("Erreur envoi alerte");
     return response.json();
   }
 };
