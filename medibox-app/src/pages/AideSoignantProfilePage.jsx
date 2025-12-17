@@ -2,8 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useAuth } from '../AuthContext';
 import LogoutButton from '../LogoutButton';
-//import AlertsPanel from '../components/AlertsPanel';
-
+import AlertsPanel from '../components/AlertsPanel';
 
 const API_KEY = "9769a0eab09284d4bfeef45e4103642cf00b1b17f15f65afeb4f336890e37e63";
 const API_URL_BASE = "https://apidatabasesae-aee3egcmdke2b6a2.germanywestcentral-01.azurewebsites.net/api";
@@ -679,7 +678,12 @@ const AideSoignantProfilePage = () => {
         <div className="alert-box">Aucune alerte pour le moment</div> 
       </div>
 
-    
+       {user && (
+        <AlertsPanel 
+          aideId={user.id} 
+          password={user.data?.mot_de_passe} 
+        />
+      )}
     </div>
   );
 };

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../AuthContext';
 import LogoutButton from '../LogoutButton';
-//import AlertsPanel from '../components/AlertsPanel';
+import AlertsPanel from '../components/AlertsPanel';
 
 
 const API_KEY = "9769a0eab09284d4bfeef45e4103642cf00b1b17f15f65afeb4f336890e37e63";
@@ -10,6 +10,7 @@ const API_URL_BASE = "https://apidatabasesae-aee3egcmdke2b6a2.germanywestcentral
 
 const AideSoignantListPage = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const id_aide_soignant = "test";
 
   const [patients, setPatients] = useState([]);
@@ -170,8 +171,12 @@ const AideSoignantListPage = () => {
         </div>
       </div>
 
-
-    
+        {user && (
+        <AlertsPanel 
+          aideId={user.id} 
+          password={user.data?.mot_de_passe} 
+        />
+      )}
     </div>
   );
 };
