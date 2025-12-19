@@ -36,22 +36,19 @@ fun ComposeWrappedWebView() {
                     ViewGroup.LayoutParams.MATCH_PARENT
                 )
 
-                // Compose previews don't fully support legacy Android views
-                // https://github.com/google/accompanist/issues/1326#issuecomment-1251355470
                 if (!inPreview) {
-                    /**
-                     * Enable JavaScript in the WebView. This is required to load JS in the WebView.
-                     * The compiler will warn you that this can cause XSS security issues but since we
-                     * are loading our own assets, this is not a concern hence the
-                     * `@Suppress("SetJavaScriptEnabled")` annotation.
-                     *
-                     * See https://developer.android.com/reference/android/webkit/WebSettings#setJavaScriptEnabled(boolean)
-                     */
+                    // 1. ACTIVER LE JAVASCRIPT (Obligatoire pour React)
                     @Suppress("SetJavaScriptEnabled")
-                    settings.javaScriptEnabled = false
+                    settings.javaScriptEnabled = true  // <--- CHANGEZ 'false' EN 'true'
+
+                    // 2. ACTIVER LE DOM STORAGE (Obligatoire pour votre AuthContext et localStorage)
+                    settings.domStorageEnabled = true
+
+                    // 3. (Optionnel mais recommandé) Permettre le zoom si besoin
+                    settings.setSupportZoom(false)
                 }
 
-                webViewClient =  object : WebViewClient() {
+                webViewClient = object : WebViewClient() {
                     override fun shouldInterceptRequest(
                         view: WebView,
                         request: WebResourceRequest
@@ -60,12 +57,9 @@ fun ComposeWrappedWebView() {
                     }
                 }
 
-                /**
-                 * This is the URL that will be loaded when the WebView is first
-                 * The assets directory is served by a domain `https://appassets.androidplatform.net`
-                 * Learn more about the WebViewAssetLoader here:
-                 * https://developer.android.com/reference/androidx/webkit/WebViewAssetLoader
-                 */
+                // 4. VERIFICATION DU CHEMIN
+                // Assurez-vous que vos fichiers React (index.html, assets, etc.) sont bien
+                // dans le dossier android/app/src/main/assets/dist/
                 loadUrl("https://appassets.androidplatform.net/assets/dist/index.html")
             }
         },
