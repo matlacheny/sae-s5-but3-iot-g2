@@ -1,6 +1,8 @@
+import dotenv from "dotenv";
+dotenv.config();
 
 const SERVER_CONFIG = {
-  API_KEY: '9769a0eab09284d4bfeef45e4103642cf00b1b17f15f65afeb4f336890e37e63',
+  API_KEY: process.env.API_KEY,
   
   async getServerUrl() {
     

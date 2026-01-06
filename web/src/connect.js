@@ -2,9 +2,11 @@ document.addEventListener("DOMContentLoaded", (event) => {
   console.log("DOM fully loaded and parsed"); // test pour savoir si tout est bien chargé
 });
 
+import dotenv from "dotenv";
+dotenv.config();
 
 const API_PATH = "https://apidatabasesae-aee3egcmdke2b6a2.germanywestcentral-01.azurewebsites.net";
-const API_KEY = "9769a0eab09284d4bfeef45e4103642cf00b1b17f15f65afeb4f336890e37e63"; // A RETIRER, EN DUR QUE POUR LES TESTS
+const API_KEY = process.env.API_KEY;
 // liste qui va servir à faire les fetch et les rediretions en dynamique
 // ATTENTION, CA VEUT DIRE QUE LES NOMS DE FICHIERS ET DE BD DOIVENT SUIVRE UN CERTAIN FORMAT, SINON CA PLANTE
 var LISTE_ROLES = ["Medecins","Patients","AideSoignants"];
