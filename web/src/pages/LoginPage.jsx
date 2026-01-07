@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../AuthContext.jsx';
+import { Link } from 'react-router-dom';
 
 const LoginPage = () => {
   const [id, setId] = useState('');
@@ -54,6 +55,25 @@ const LoginPage = () => {
         width: '100%',
         maxWidth: '400px'
       }}>
+
+ <div style={{ textAlign: 'center', marginBottom: '30px', position: 'relative' }}>
+  <Link 
+    to="/signup" 
+    style={{
+      position: 'absolute',
+      top: '0',
+      right: '0',
+      color: '#4a73d9',
+      textDecoration: 'none',
+      fontSize: '14px',
+      fontWeight: 'bold'
+    }}
+  >
+    Créer un compte →
+  </Link>
+
+</div>
+
         <div style={{ textAlign: 'center', marginBottom: '30px' }}>
           <h1 style={{ color: '#2b4c7e', margin: '0 0 10px 0' }}>MediAPP</h1>
           <p style={{ color: '#666', margin: 0 }}>Connexion à votre espace</p>
@@ -155,6 +175,9 @@ const LoginPage = () => {
           fontSize: '12px',
           color: '#666'
         }}>
+
+
+
           <strong>Exemples de connexion:</strong>
           <div style={{ marginTop: '8px' }}>
             <div>• Patient: jdupont123 / SuperSecret2024</div>

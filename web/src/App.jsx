@@ -11,6 +11,8 @@ import MedecinProfilePage from './pages/MedecinProfilePage';
 import AideSoignantListPage from './pages/AideSoignantListPage';
 import AideSoignantProfilePage from './pages/AideSoignantProfilePage';
 import AssignAideSoignantPage from './pages/AssignAideSoignantPage';
+import SignupPage from './pages/SignupPage';
+
 
 function App() {
   return (
@@ -73,6 +75,8 @@ function App() {
               </ProtectedRoute>
             } 
           />
+
+          <Route path="/signup" element={<SignupPage />} />
           
           {/* Redirection par défaut vers login */}
           <Route path="/" element={<Navigate to="/login" replace />} />
