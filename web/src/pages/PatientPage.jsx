@@ -2,8 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../AuthContext.jsx';
 import LogoutButton from '../LogoutButton.jsx';
+import SERVER_CONFIG from '../config/serverConfig';
 
-const API_KEY = "9769a0eab09284d4bfeef45e4103642cf00b1b17f15f65afeb4f336890e37e63";
+const API_KEY = SERVER_CONFIG.API_KEY;
 const API_URL_BASE = "https://apidatabasesae-aee3egcmdke2b6a2.germanywestcentral-01.azurewebsites.net/api";
 
 const PatientPage = () => {
@@ -171,7 +172,7 @@ const PatientPage = () => {
           padding: '30px', 
           borderRadius: '8px',
           boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-          maxWidth: '500px'
+          maxWidth: '400px'
         }}>
           <h2 style={{ color: '#dc3545' }}>⚠️ Erreur</h2>
           <p>{error}</p>
@@ -208,7 +209,17 @@ const PatientPage = () => {
   return (
     <div style={{ fontFamily: 'Arial, sans-serif', margin: 0, padding: 0, backgroundColor: '#f8f8f8' }}>
       <style>{`
-        body { margin: 0; padding: 0; }
+        html, body {
+          overflow-x: hidden; /* Empêche le défilement horizontal */
+          width: 100%;
+          max-width: 100vw;
+        }
+
+        /* Pour votre élément racine */
+        #root {
+          max-width: 100%;
+          overflow-x: hidden;
+        }
         
         header {
           display: flex;
@@ -239,6 +250,7 @@ const PatientPage = () => {
           background-color: white;
           padding: 20px;
           border-radius: 8px;
+          
           box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
         .bloc-info h2 {

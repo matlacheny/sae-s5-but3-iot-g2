@@ -16,13 +16,13 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const savedUser = sessionStorage.getItem('mediapp_user');
+    const savedUser = localStorage.getItem('mediapp_user');
     if (savedUser) {
       try {
         setUser(JSON.parse(savedUser));
       } catch (error) {
         console.error('Erreur chargement session:', error);
-        sessionStorage.removeItem('mediapp_user');
+        localStorage.removeItem('mediapp_user');
       }
     }
     setLoading(false);
@@ -56,15 +56,17 @@ export const AuthProvider = ({ children }) => {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            "ngrok-skip-browser-warning": "true" // Pour éviter l'avertissement Ngrok
+            "ngrok-skip-browser-warning": "true", // Pour éviter l'avertissement Ngrok
+            "token": SERVER_CONFIG.API_KEY,
           },
           body: JSON.stringify({
             id: id,
             password: password,
+            //token : SERVER_CONFIG.API_KEY,
             role: role.name
           })
         });
-
+        console.log(SERVER_CONFIG.API_KEY);
         console.log(`[LOGIN] Status: ${response.status}`);
 
         if (response.ok) {
@@ -86,7 +88,7 @@ export const AuthProvider = ({ children }) => {
           };
           
           setUser(userInfo);
-          sessionStorage.setItem('mediapp_user', JSON.stringify(userInfo));
+          localStorage.setItem('mediapp_user', JSON.stringify(userInfo));
           return { success: true, user: userInfo };
         } else if (response.status === 401) {
           console.log(`[LOGIN] ❌ Mot de passe incorrect pour ${role.name}`);
@@ -104,7 +106,7 @@ export const AuthProvider = ({ children }) => {
 
   const logout = () => {
     setUser(null);
-    sessionStorage.removeItem('mediapp_user');
+    localStorage.removeItem('mediapp_user');
   };
 
   return (

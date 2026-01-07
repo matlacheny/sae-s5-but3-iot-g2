@@ -43,7 +43,7 @@ class WebSocketService {
       return;
     }
 
-    const fullWsUrl = `${wsUrl}?token=${SERVER_CONFIG.API_KEY}&id=${aideId}&pwd=${encodeURIComponent(password)}`;
+    const fullWsUrl = `${wsUrl}?token=${encodeURIComponent(SERVER_CONFIG.API_KEY)}&id=${encodeURIComponent(aideId)}&pwd=${encodeURIComponent(password)}`;
     
     console.log('🔌 [WebSocket] Connexion pour aide-soignant:', aideId);
 

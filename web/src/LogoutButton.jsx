@@ -7,10 +7,15 @@ const LogoutButton = () => {
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    if (window.confirm('Voulez-vous vraiment vous déconnecter ?')) {
+    logout();
+      navigate(
+        '/login');
+    /*if (window.confirm('Voulez-vous vraiment vous déconnecter ?')) {
       logout();
-      navigate('/login');
-    }
+      navigate(
+        '/login');
+    }*/
+
   };
 
   return (

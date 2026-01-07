@@ -5,7 +5,7 @@ import LogoutButton from '../LogoutButton.jsx';
 import AlertsPanel from '../components/AlertsPanel';
 import SERVER_CONFIG from '../config/serverConfig';
 
-const API_KEY = "9769a0eab09284d4bfeef45e4103642cf00b1b17f15f65afeb4f336890e37e63";
+const API_KEY = SERVER_CONFIG.API_KEY;
 const API_URL_BASE = "https://apidatabasesae-aee3egcmdke2b6a2.germanywestcentral-01.azurewebsites.net/api";
 
 const AideSoignantListPage = () => {
@@ -212,6 +212,7 @@ Mot de passe temporaire: ${data.tempPassword}
         }
         .patient-list {
           max-height: 400px;
+          min-width: 400px
           width: 60%;
           margin: 0 auto;
           overflow-y: auto;
