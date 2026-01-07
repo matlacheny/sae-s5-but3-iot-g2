@@ -32,6 +32,9 @@ const AideSoignantListPage = () => {
   const [patientSuccess, setPatientSuccess] = useState('');
   const [creatingPatient, setCreatingPatient] = useState(false);
 
+  // États pour la suppression
+  const [deletingPatient, setDeletingPatient] = useState(null);
+
   useEffect(() => {
     chargerPatients();
   }, []);
@@ -119,12 +122,8 @@ Mot de passe temporaire: ${data.tempPassword}
           adresse_electronique: ''
         });
         
-        // Recharger la liste après 5 secondes
-        setTimeout(() => {
-          chargerPatients();
-          setShowPatientModal(false);
-          setPatientSuccess('');
-        }, 5000);
+        // Recharger la liste sans fermer le modal
+        chargerPatients();
       } else {
         setPatientError(data.error || 'Erreur lors de la création du patient');
       }
@@ -133,6 +132,44 @@ Mot de passe temporaire: ${data.tempPassword}
       setPatientError('Erreur de connexion au serveur');
     } finally {
       setCreatingPatient(false);
+    }
+  };
+
+  // Fonction de suppression de patient
+  const handleDeletePatient = async (patient) => {
+    const confirmation = window.confirm(
+      `⚠️ ATTENTION ⚠️\n\nVoulez-vous vraiment supprimer le patient :\n\n${patient.prenom} ${patient.nomFamille}\n(ID: ${patient.id_patient})\n\nCette action supprimera définitivement :\n• Son compte\n• Ses données médicales\n• Son historique\n\nCette action est IRRÉVERSIBLE !`
+    );
+
+    if (!confirmation) {
+      return;
+    }
+
+    setDeletingPatient(patient.id_patient);
+
+    try {
+      const serverUrl = await SERVER_CONFIG.getServerUrl();
+      const response = await fetch(`${serverUrl}/api/patients/${patient.id_patient}`, {
+        method: 'DELETE',
+        headers: {
+          'api_key': API_KEY,
+          'ngrok-skip-browser-warning': 'true'
+        }
+      });
+
+      if (response.ok) {
+        alert(`✅ Le patient ${patient.prenom} ${patient.nomFamille} a été supprimé avec succès.`);
+        // Recharger la liste
+        chargerPatients();
+      } else {
+        const error = await response.json();
+        alert(`❌ Erreur lors de la suppression : ${error.error || 'Erreur inconnue'}`);
+      }
+    } catch (err) {
+      console.error('Erreur suppression patient:', err);
+      alert('❌ Erreur de connexion au serveur');
+    } finally {
+      setDeletingPatient(null);
     }
   };
 
@@ -223,10 +260,36 @@ Mot de passe temporaire: ${data.tempPassword}
         .patient-item {
           padding: 15px;
           border-bottom: 1px solid #eee;
-          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 15px;
         }
         .patient-item:hover {
           background-color: #f0f8ff;
+        }
+        .patient-info {
+          display: flex;
+          align-items: center;
+          gap: 15px;
+          flex: 1;
+        }
+        .delete-btn {
+          background-color: transparent;
+          border: none;
+          cursor: pointer;
+          font-size: 20px;
+          padding: 5px;
+          color: #dc3545;
+          transition: all 0.3s;
+        }
+        .delete-btn:hover:not(:disabled) {
+          color: #c82333;
+          transform: scale(1.2);
+        }
+        .delete-btn:disabled {
+          opacity: 0.5;
+          cursor: not-allowed;
         }
         .profile-btn {
           background-color: white;
@@ -234,7 +297,9 @@ Mot de passe temporaire: ${data.tempPassword}
           padding: 5px 10px;
           border-radius: 6px;
           cursor: pointer;
-          float: right;
+        }
+        .profile-btn:hover {
+          background-color: #e8e8e8;
         }
       `}</style>
 
@@ -284,7 +349,17 @@ Mot de passe temporaire: ${data.tempPassword}
           ) : (
             filteredPatients.map(p => (
               <div key={p.id_patient} className="patient-item">
-                <span>{p.prenom} {p.nomFamille}</span>
+                <div className="patient-info">
+                  <button
+                    className="delete-btn"
+                    onClick={() => handleDeletePatient(p)}
+                    disabled={deletingPatient === p.id_patient}
+                    title="Supprimer ce patient"
+                  >
+                    {deletingPatient === p.id_patient ? '⏳' : '🗑️'}
+                  </button>
+                  <span>{p.prenom} {p.nomFamille}</span>
+                </div>
                 <button
                   className="profile-btn"
                   onClick={() => navigate(`/aide-soignant/profile?id=${p.id_patient}`)}
@@ -297,8 +372,6 @@ Mot de passe temporaire: ${data.tempPassword}
         </div>
 
         <div id="legend" style={{ marginTop: '15px', display: filteredPatients.length > 0 ? 'block' : 'none' }}>
-          <span style={{ width: '15px', height: '15px', background: '#cfe3ff', display: 'inline-block', borderRadius: '4px' }}></span>
-          <span style={{ marginLeft: '8px' }}>Vos patients</span>
         </div>
       </div>
 
