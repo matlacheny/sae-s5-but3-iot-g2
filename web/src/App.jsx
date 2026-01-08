@@ -13,7 +13,6 @@ import AideSoignantProfilePage from './pages/AideSoignantProfilePage';
 import AssignAideSoignantPage from './pages/AssignAideSoignantPage';
 import SignupPage from './pages/SignupPage';
 
-
 function App() {
   return (
     <AuthProvider>
