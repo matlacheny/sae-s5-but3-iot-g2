@@ -159,8 +159,8 @@ const MedecinListPage = () => {
         }
         .patient-list {
           max-height: 400px;
-          min-width: 400px
-          width: 60%;
+          min-width: 70%;
+          max-width: 90%;
           margin: 0 auto;
           overflow-y: auto;
           border: 1px solid #ccc;

@@ -280,17 +280,20 @@ const MedecinProfilePage = () => {
         }
         .container {
           padding: 20px;
+          max-width: 90%;
         }
         .infos {
           display: flex;
           gap: 30px;
           margin-bottom: 30px;
+          max-width: 80%;
         }
         .bloc-info {
-          flex: 1;
+          max-width: 40%;
           background-color: white;
           padding: 20px;
           border-radius: 8px;
+          
           box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
         .bloc-info h2 {
@@ -300,6 +303,7 @@ const MedecinProfilePage = () => {
         h2.section-title {
           margin-top: 40px;
           color: #1e3d59;
+          max-width: 80%;
         }
         .pdf-viewer {
           width: 100%;
@@ -310,7 +314,7 @@ const MedecinProfilePage = () => {
           background-color: #f9f9f9;
         }
         .no-prescription {
-          width: 100%;
+          width: 90%;
           height: 500px;
           border: 2px dashed #ccc;
           border-radius: 8px;
@@ -349,6 +353,7 @@ const MedecinProfilePage = () => {
         .calendar {
           background-color: white;
           padding: 20px;
+          max-width: 90%;
           border-radius: 8px;
           box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
@@ -375,6 +380,7 @@ const MedecinProfilePage = () => {
         .os-calendar {
           background: #fff;
           padding: 20px;
+          max-width: 85%;
           border-radius: 12px;
           box-shadow: 0 4px 10px rgba(0,0,0,0.1);
           width: 350px;
@@ -397,6 +403,7 @@ const MedecinProfilePage = () => {
           display: grid;
           grid-template-columns: repeat(7, 1fr);
           gap: 8px;
+          max-width: 80%;
           text-align: center;
         }
         .day-name {

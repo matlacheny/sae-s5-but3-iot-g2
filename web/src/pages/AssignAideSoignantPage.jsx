@@ -41,9 +41,9 @@ const { user } = useAuth();
   };
 
   const assignerAideSoignant = async (idAS, nom, prenom) => {
-if (!window.confirm(`Confirmer l'assignation de ${prenom} ${nom} (ID: ${idAS}) au patient ${idPatient} ?`)) {
+/*if (!window.confirm(`Confirmer l'assignation de ${prenom} ${nom} (ID: ${idAS}) au patient ${idPatient} ?`)) {
       return;
-    }
+    }*/
 
     try {
       const getResp = await fetch(`${API_BASE}/patients/${idPatient}`, {

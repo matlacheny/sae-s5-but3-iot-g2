@@ -239,14 +239,16 @@ const PatientPage = () => {
         }
         .container {
           padding: 20px;
+          max-width: 90%;
         }
         .infos {
           display: flex;
           gap: 30px;
           margin-bottom: 30px;
+          max-width: 80%;
         }
         .bloc-info {
-          flex: 1;
+          max-width: 40%;
           background-color: white;
           padding: 20px;
           border-radius: 8px;
@@ -260,6 +262,7 @@ const PatientPage = () => {
         h2.section-title {
           margin-top: 40px;
           color: #1e3d59;
+          max-width: 80%;
         }
         .pdf-viewer {
           width: 100%;
@@ -270,7 +273,7 @@ const PatientPage = () => {
           background-color: #f9f9f9;
         }
         .no-prescription {
-          width: 100%;
+          width: 90%;
           height: 400px;
           border: 2px dashed #ccc;
           border-radius: 8px;
@@ -290,8 +293,10 @@ const PatientPage = () => {
         .calendar {
           background-color: white;
           padding: 20px;
+          max-width: 90%;
           border-radius: 8px;
           box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+          
         }
         .modal-overlay {
           position: fixed;
@@ -331,6 +336,7 @@ const PatientPage = () => {
         .os-calendar {
           background: #fff;
           padding: 20px;
+          max-width: 85%;
           border-radius: 12px;
           box-shadow: 0 4px 10px rgba(0,0,0,0.1);
           width: 350px;
@@ -351,6 +357,7 @@ const PatientPage = () => {
         }
         .cal-grid {
           display: grid;
+          max-width: 80%;
           grid-template-columns: repeat(7, 1fr);
           gap: 8px;
           text-align: center;

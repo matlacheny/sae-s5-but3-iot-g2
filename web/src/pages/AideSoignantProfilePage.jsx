@@ -272,17 +272,20 @@ const AideSoignantProfilePage = () => {
         }
         .container {
           padding: 20px;
+          max-width: 90%;
         }
         .infos {
           display: flex;
           gap: 30px;
           margin-bottom: 30px;
+          max-width: 80%;
         }
         .bloc-info {
-          flex: 1;
+          max-width: 40%;
           background-color: white;
           padding: 20px;
           border-radius: 8px;
+          
           box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
         .bloc-info h2 {
@@ -292,6 +295,7 @@ const AideSoignantProfilePage = () => {
         h2.section-title {
           margin-top: 40px;
           color: #1e3d59;
+          max-width : 90%;
         }
         .pdf-viewer {
           width: 100%;
@@ -303,6 +307,7 @@ const AideSoignantProfilePage = () => {
         .calendar {
           background-color: white;
           padding: 20px;
+          max-width: 80%;
           border-radius: 8px;
           box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
@@ -329,6 +334,7 @@ const AideSoignantProfilePage = () => {
         .os-calendar {
           background: #fff;
           padding: 20px;
+          max-width: 100%;
           border-radius: 12px;
           box-shadow: 0 4px 10px rgba(0,0,0,0.1);
           width: 350px;
@@ -376,12 +382,14 @@ const AideSoignantProfilePage = () => {
           align-items: center;
           gap: 10px;
           margin-bottom: 20px;
+          max-width: 80%;
         }
         .compartiments-row {
           display: flex;
           gap: 10px;
           justify-content: center;
           margin-bottom: 20px;
+          max-width: 80%;
         }
         .compartiment {
           width: 140px;
@@ -422,6 +430,7 @@ const AideSoignantProfilePage = () => {
           justify-content: center;
           margin-top: 20px;
           margin-bottom: 30px;
+          max-width: 90%;
         }
         .btn-enregistrer {
           background-color: #28a745;
@@ -500,12 +509,13 @@ const AideSoignantProfilePage = () => {
           color: red;
           font-weight: bold;
           margin-bottom: 10px;
+          max-width: 90%;
         }
         .alert-box {
           background: #ffe6e6;
           padding: 15px;
           border-radius: 12px;
-          min-width: 600px;
+          max-width: 80%;
         }
       `}</style>
 
